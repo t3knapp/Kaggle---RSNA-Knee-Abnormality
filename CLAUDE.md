@@ -4,9 +4,25 @@
 
 This project exists to **learn applied deep learning for medical imaging** — multimodal (3D MRI + radiology report text) multi-label classification specifically. It is not a leaderboard-chasing project.
 
-**Doing well in the competition is a side effect of doing the learning well, not the goal.** If a choice trades away understanding for a quick score bump (e.g. copying a public notebook's architecture without understanding why it works, or blindly tuning hyperparameters via grid search without forming a hypothesis first), the correct move is to flag the tradeoff and default toward the learning path unless the user explicitly says otherwise. Every non-trivial modeling decision should be traceable to a documented reason, not just "it scored better."
+**We are aiming to be competitive, but only ever via choices we understand and can defend on paper.** Score is not ignored — a well-understood technique that also happens to score well should be used — but a score gain purchased with a choice we can't explain (e.g. copying a public notebook's architecture without understanding why it works, or blindly tuning hyperparameters via grid search without forming a hypothesis first) is not a win. The correct move in that situation is to flag the tradeoff and default toward the understood path unless the user explicitly says otherwise. Every non-trivial modeling decision should be traceable to a documented reason, not just "it scored better."
 
 The competition itself: **RSNA Knee Abnormality Detection** (hosted by RSNA + Kaggle, 2026). Multi-label classification of twelve clinically important abnormalities on knee MRI exams, using both DICOM image volumes and paired (multilingual) radiology report text — the first RSNA challenge to combine imaging with report text for training. ~5,000+ exams from 16–19 global sites. Entry deadline October 15, 2026.
+
+## Ground Rules for Collaboration
+
+### Decision-making: propose, then act
+
+For any non-trivial modeling or design decision, lay out the options and the reasoning *before* implementing anything, and wait for input before proceeding. Local scaffolding, boilerplate, tests, and pure plumbing (env setup, data loaders matching an already-agreed-on format, refactors with no behavioral change) don't need a check-in — just do them.
+
+"Non-trivial" is read broadly here (see the Documentation Standard below for what that includes) — when in doubt, propose rather than assume.
+
+### Teaching style: predict-then-reveal
+
+Before revealing the result of an experiment — a training curve, a validation metric, a confusion matrix, an ablation — first ask what result to expect and why. Then compare the prediction against what actually happened. The gap between the two (or the confirmation, when the prediction holds) is the teaching moment and belongs in the DESIGN.md writeup for that decision, not just the raw number.
+
+### Workflow: PRs only, never push to `main` directly
+
+All work happens on a feature branch and lands via pull request against [t3knapp/Kaggle---RSNA-Knee-Abnormality](https://github.com/t3knapp/Kaggle---RSNA-Knee-Abnormality) — `main` is never committed to or pushed to directly, no exceptions. This includes documentation-only changes (CLAUDE.md, DESIGN.md, SESSION.md): they go through a PR too, since the review pass is part of how the "propose, then act" habit above actually gets enforced. Open the PR, but leave merging to the user unless they say otherwise.
 
 ## Documentation Standard
 
@@ -14,6 +30,8 @@ Every design and model decision gets written up in `DESIGN.md` (or dated entries
 
 - Has a solid math background (linear algebra, probability, calculus, comfortable with proofs and notation) — so do NOT hand-wave the math or avoid equations.
 - Has little to no prior exposure to deep learning / modeling practice — so DO explain things a practitioner would take for granted: why a particular loss function fits a particular label structure, what a receptive field is and why it matters here, why batch norm interacts with small batch sizes, why 3D volumes get sliced/pooled a particular way, what a validation scheme is actually protecting against, etc.
+
+The threshold for "significant" is broad, not just architecture-level. It includes: loss function choice, model architecture, validation scheme, modality fusion strategy, class-imbalance handling — but also optimizer choice, LR schedule, augmentation strategy, batch size rationale, and similar. If you formed a hypothesis before trying something, or would need to re-derive the reasoning if asked "why this and not the alternative," it earns an entry. Pure engineering choices with no modeling consequence (code organization, logging format, dependency versions) don't.
 
 For each significant decision, the writeup should cover:
 1. **What we're deciding** — stated precisely.

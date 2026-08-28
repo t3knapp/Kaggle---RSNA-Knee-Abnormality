@@ -1,0 +1,13 @@
+{
+  "id": "tilernap/rsna-knee-00-env-data-check",
+  "title": "RSNA Knee - 00 Env & Data Check",
+  "code_file": "00_env_data_check.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": false,
+  "dataset_sources": [],
+  "competition_sources": ["rsna-knee-abnormality-detection"],
+  "kernel_sources": []
+}
