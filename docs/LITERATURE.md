@@ -169,7 +169,29 @@ its complexity at our scale is an open question.
 
 ## 3. Training a model on labels you know are wrong
 
-Once labels are noisy, the loss function matters. The theory here is clean:
+> **The mathematics of this section is worked through in full in
+> [`NOISE-THEORY.md`](NOISE-THEORY.md)** — theorem statements, proofs of the elementary
+> steps, the assumptions each result requires, and an honest audit of which of those
+> assumptions hold in our case. Read that document rather than this summary before making
+> any decision that leans on noise-robustness.
+
+**The headline, in brief.** Because our metric is AUC — a pure ranking metric, blind to
+calibration — label noise is far less damaging than intuition suggests, *provided* the
+noise is class-conditional. [Menon et al., ICML 2015](https://proceedings.mlr.press/v37/menon15.pdf)
+(Cor. 3) prove that under class-conditional noise, corrupted AUC is an affine increasing
+function of clean AUC, so the AUC-maximising scorer is the same either way — no knowledge
+of the noise rates required. The cost shows up not in attainable ranking but in *data
+efficiency*, scaling as $\frac{1}{1-\alpha-\beta}$ and, punishingly for rare findings,
+$\frac{1}{\bar\pi(1-\bar\pi)}$.
+
+**The catch.** That guarantee fails under general instance-dependent noise
+([Menon et al. 2016](https://arxiv.org/abs/1605.00751)), and our dominant noise mechanism —
+findings omitted because they weren't clinically actionable *for that study* — is
+instance-dependent in exactly the way that breaks it. A structured subclass (BCN+, where
+noise concentrates on ambiguous cases) does preserve ranking, and our *severity-threshold*
+disagreements fit it; our *omission* disagreements do not. Proportions unmeasured.
+
+Separately from the metric argument, the loss function itself matters:
 
 A loss is **noise-tolerant** if it satisfies a symmetry condition — informally, if
 $\sum_{k} \ell(f(x), k)$ is constant over classes $k$, then the risk minimizer under
@@ -191,6 +213,13 @@ class-conditional and instance-independent. Our noise is neither: it is structur
 (non-actionable findings are missing systematically, not randomly), instance-dependent
 (depends on the clinical indication), and asymmetric per label. Robust losses may help;
 they are not a solution.
+
+**And a reframing.** Given the AUC argument above, robust losses are better understood here
+as **variance-reduction tools than as bias corrections**. Under class-conditional noise
+there is no ranking bias to correct — the damage is purely statistical, so anything that
+improves sample efficiency helps. Against the instance-dependent component there *is* real
+bias, but these losses were not designed for it. See
+[`NOISE-THEORY.md`](NOISE-THEORY.md) §5 and §8.
 
 ---
 
