@@ -248,10 +248,67 @@ real decision with per-label consequences, not a detail.
 
 ---
 
-## 7. Report-to-label extraction: viability probe
+## 7. Where the labels come from — and why it matters
 
-*(Pending — result to be recorded here after the predict-then-reveal step.)*
+**Confirmed by the competition organizers: the twelve labels are produced by an
+independent read of the images, not extracted from the reports.**
 
-The central question for §4 of `DESIGN.md`: given a report, how well can the twelve
-labels be recovered from it? A crude multilingual keyword/regex probe was run against
-the 58 gold studies to establish a floor. Prediction and outcome to be written up here.
+This is the single most consequential fact about the dataset, and it is not visible from
+the CSVs alone. It means the reports are a *proxy* for the target, not the target itself.
+A perfect report-reader — one that handles negation, severity, and all three writing
+systems flawlessly — would still produce wrong labels wherever the reporting radiologist
+and the annotating radiologist disagreed.
+
+### Direct evidence in the gold set
+
+Reading the English-language gold studies against their labels shows disagreement in
+**both** directions, which is the signature of two independent readers rather than a
+lossy extraction process:
+
+| Study | Report says | Label |
+|---|---|---|
+| 1 | "Moderate joint effusion... are observed" | `Effusion = 0` |
+| 1 | "Osteochondral fracture at lateral patellar facet" | `Fracture = 0` |
+| 2 | *(synovitis never mentioned)* | `Synovitis = 1` |
+| 3 | "Synovitis of left knee and massive joint effusion" | `Synovitis = 0`, `Effusion = 1` |
+| 5 | "complex tear... posterior horn of the lateral meniscus" | `Lateral Meniscus = 0` |
+| 5 | *(synovitis never mentioned)* | `Synovitis = 1` |
+| 4 | every finding stated explicitly | all 12 match exactly |
+
+A pure text-extraction process can only ever produce false *negatives* relative to the
+report (missing what is stated). Labels that are **positive when the report is silent**
+— studies 2 and 5 — can only come from someone looking at the images.
+
+`Effusion` does show a coherent severity threshold, which is a text-extractable pattern:
+
+| Report | Label |
+|---|---|
+| "No knee effusion" | 0 |
+| "Small joint effusion" | 0 |
+| "Moderate joint effusion" | 0 |
+| "Some amount... with hemarthrosis" | 1 |
+| "massive joint effusion" | 1 |
+
+So the gap is not uniform across labels — part of it is a learnable calibration problem,
+and part of it is irreducible reader disagreement.
+
+### The keyword-matching floor
+
+A crude multilingual regex labeller scored against the 58 gold studies gives mean
+precision **0.47**, mean recall **0.45**, mean agreement **63%**. Two caveats keep this
+from being a clean measurement: the probe's own patterns were demonstrably broken for
+`Medial OA` and `Lateral OA` (zero true positives — the regex missed Spanish *artrosis*
+and English *tricompartmental osteoarthritis* entirely), and n=58 is small. Treat 63% as
+a loose floor, not an estimate.
+
+### Consequence
+
+This is a **weak-supervision problem with a known, structured label-noise mechanism** —
+which is a well-studied setting. See [`LITERATURE.md`](LITERATURE.md): the same
+report-vs-image gap is documented in chest radiography at kappa 0.31–0.43, with
+"non-actionable findings omitted from reports" identified as the dominant cause. That
+mechanism explains our `Synovitis = 1` cases exactly.
+
+The design consequence is that the 58 gold studies are best understood not as training
+data but as **the only instrument we have for measuring how good a labeller is**.
+`DESIGN.md` §4 has to decide how to spend them.

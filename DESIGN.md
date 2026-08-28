@@ -56,12 +56,20 @@ a decision; this section is a pointer to it and a home for later revisions.
 
 ## Part II — Supervision: the central problem
 
-### 4. `[ ]` Label strategy — where training labels come from
+### 4. `[~]` Label strategy — where training labels come from
 The competition ships ~1.3% of studies with labels and the rest with only free-text
 reports (see `docs/DATA.md`). Nothing downstream can be designed until we decide how
-to turn reports into training targets. Covers: rule-based extraction vs. an LLM
-labeller vs. training directly on text embeddings, how to validate a labeller when
-the gold set is 58 studies, and how label noise propagates into the image model.
+to turn reports into training targets.
+
+**Established so far:** labels come from an independent image read, so reports are a
+proxy with irreducible error, not a lossy encoding of the target. Prior art on this exact
+gap is surveyed in [`docs/LITERATURE.md`](docs/LITERATURE.md), which also enumerates the
+candidate approaches (A–E) this section must choose among.
+
+**Constraint:** LLM-based labelling is permitted but may not run at kernel runtime.
+Labels must be precomputed offline and attached as a Kaggle Dataset. This costs us
+nothing — reports are absent at test time, so labelling is purely a training-data-prep
+step and never sits on the inference path.
 
 ### 5. `[ ]` Handling label noise and uncertainty
 Given labels will be *derived*, they will be wrong some of the time. Covers: soft vs.
@@ -160,3 +168,8 @@ Tracked here when they don't belong to a single section yet.
 - **Whether reports are truly absent at inference.** Strongly implied by `test.csv`
   having no `Report` column, but worth confirming against the competition's data
   description before committing to §6.
+- **The size of our own report-image gap is unmeasured.** Chest-radiography studies put
+  report-vs-image agreement at kappa 0.31–0.43, but knee MRI is a more specific modality
+  and the number may differ substantially. Estimating it on the 58 gold studies is the
+  most informative single measurement available to us, and probably belongs before §4 is
+  settled.
