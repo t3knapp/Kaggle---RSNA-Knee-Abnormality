@@ -37,10 +37,15 @@ multi-label (not multi-class) problem, and what "abnormality detection" means
 operationally here.
 
 ### 2. `[ ]` Evaluation metric and what it rewards
-What the leaderboard actually scores, and the consequences for how we train.
-Covers: why a ranking metric changes what a "good" probability means, whether
-calibration matters, how per-label averaging interacts with rare classes, and
-what a trivial baseline scores.
+**Confirmed metric:** the macro-averaged AUC ROC — the area under the ROC curve is
+computed between predicted confidence scores and observed targets for each of the twelve
+targets separately, then averaged with equal weight across them.
+
+The section still needs writing: what that metric *implies* for how we train. Covers:
+why a ranking metric makes only the ordering of predictions matter and not their
+absolute values, whether calibration is therefore worth anything to us, how equal-weight
+averaging over twelve labels interacts with rare classes, and what a trivial baseline
+scores.
 
 ### 3. `[x]` Data inventory and structure
 What is actually in the dataset. **Written up separately in
@@ -149,10 +154,6 @@ Distinct from the decision entries above — this is the evidence trail those ci
 
 Tracked here when they don't belong to a single section yet.
 
-- **Evaluation metric is unconfirmed.** Secondary sources report macro ROC-AUC over the
-  twelve labels, but this has not been read off the official Kaggle evaluation page
-  (the page is JS-rendered and could not be fetched programmatically). Confirm before
-  §2 is written, since §13 depends on it.
 - **Hidden test set size and composition are unknown.** The published `test.csv` is a
   3-study stub. Prevalence, site mix, and language mix of the real test set are all
   unknown, which limits how much we can trust any prevalence estimate.

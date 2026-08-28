@@ -234,9 +234,6 @@ real decision with per-label consequences, not a detail.
 
 ## 6. What is still unknown
 
-- **The evaluation metric has not been confirmed.** Secondary sources report macro
-  ROC-AUC; the official evaluation page is JS-rendered and could not be fetched
-  programmatically. Needs manual confirmation.
 - **Hidden test set size, prevalence, and composition.** The 3-study stub tells us
   nothing beyond schema.
 - **Whether reports are absent at inference** is strongly implied by the `test.csv`
